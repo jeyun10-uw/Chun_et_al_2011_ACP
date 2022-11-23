@@ -1,0 +1,187 @@
+&UWOPTIONS
+
+doSmoothDamping = .true.
+zbot_SmoothDamping = 1.2e3 ! height at which damping starts in meters
+tau_SmoothDamping = 150. ! timescale of strongest damping in seconds.
+
+nudge_to_sounding_winds = .true.
+
+doenforce_cgils_qfloor = .true.
+qfloor = 0.006 ! for CTL,  0.003997991 for dCMIP3b  0.003581839
+ztop_qfloor = 1300.
+tau_qfloor = 3600.
+
+nelapsemin = 450
+
+/
+
+&MICRO_M2005_PA
+
+ ! No ice for this warm rain case.
+ doicemicro = .false.
+ dograupel = .false.
+
+!bloss: first option, fixed cloud droplet number concentration (from LES specs)
+dopredictNc = .true.
+dospecifyaerosol = .true.
+doprogaerosol = .true.
+aerinitmode = 1
+doevapnc = .true.
+docloudedgeactivation = .true.
+massfactor = 1.
+
+do_m2011_scavenge = .true.
+nscv = 3
+do_scav_3d_output = .true.
+
+aerfluxmode = 2
+sflux_nacc_coef = 44440000.
+sflux_racc = 0.13
+
+Nc0 = 115. ! cloud droplet concentration, N=115/mg near cloud base
+
+aer_n1 = 20. ! below inversion, N=130/mg, diam = 255 nm
+aer_rm1 = 0.127
+aer_sig1 = 1.5
+
+aer_n2 = 50. ! above inversion, N=100/mg, diam = 205 nm
+aer_rm2 = 0.102
+aer_sig2 = 1.5
+
+doshipv2 = .false.
+shipv2_radius = 100.
+shipv2_aer_n = 0.0
+shipv2_aer_r = 25.e-9
+shipv2_time0 = 196.125, !-99999.
+shipv2_timef = 196.13029, !-99999.
+
+do_aerosol_chunk_budgets = .true.
+do_output_micro_process_rates = .true.
+DoScavengeAerosolDryDiameter = .false.
+InCloudSuperSatPercentForScavenging = 0.0
+
+/
+
+ &MICRO_DRIZZLE
+
+ Nc0 = 100.,
+ sigmag = 1.2, 
+
+/
+
+&SGS_TKE
+
+ dosmagor	= .false.,
+
+/
+
+ &PARAMETERS
+
+ caseid ='1920x192x144_50m_lcn',
+
+ nrestart = 2,
+
+ caseid_restart ='1920x192x144_50m_lc',
+ case_restart = 'S12_CTLmod',
+ !nrestart_skip = 3,
+
+ CEM = .true.,
+
+ OCEAN = .true.,
+
+ dosgs		= .true.,
+ dodamping 	= .true.,
+ doupperbound  	= .true.,
+ docloud 	= .true.,
+ doprecip 	= .true.,
+ doradsimple    = .false., 
+ dolongwave	= .true.,
+ doshortwave	= .true.,
+ dosurface 	= .true.,
+ dolargescale 	= .true.,
+ doradforcing   = .false.,
+ dosfcforcing   = .true.,
+ docoriolis 	= .true., ! use geostrophic winds
+ donudging_uv   = .true., ! no nudging -- allow inertial oscillation to settle down
+ tauls = 43200.,
+
+ !bloss: Nudge T/q starting 500m above inversion
+ donudging_tq   = .true.
+ dovariable_tauz = .true.
+ variable_tauz_offset_above_inversion = 400. ! meters
+ variable_tauz_thickness_of_onset = 300. ! meters
+ tautqls = 3600. ! seconds
+
+ !bloss: Never nudge T/q below 900m altitude
+ variable_tauz_minimum_height = 900. ! meters
+
+
+ SFC_FLX_FXD    = .false., ! interactive surface fluxes
+ SFC_TAU_FXD    = .false.,
+
+ latitude0 = 35.0,
+ longitude0 = -125.,
+
+ ug = 0.,
+ vg = -10.5,
+
+ dx = 50.,
+ dy = 50.,
+
+ dt =  3.,
+
+ doperpetual = .false.,
+ dosolarconstant = .true.,
+ solar_constant = 780.71 ! 712.04, S6
+ zenith_angle = 52.7 !51.0, S6
+ nrad = 5,
+ day0=196.,
+
+! doperpetual = .false.,
+! nrad = 12,
+! day0=197.,
+
+nstop 	= 47400, !28800, !172800, !25920,
+nprint  = 300,
+nstat 	= 300,
+nstatfrq= 60,
+
+ nsave2D	= 300,
+ nsave2Dstart	= 0,
+ nsave2Dend	= 99997200,
+ save2Dbin      = .true.
+ save2Davg = .false.
+
+ nsave3D	= 600,
+ nsave3Dstart	= 0,
+ nsave3Dend	= 999999999,
+ save3Dbin      = .true.
+
+ doisccp = .true.
+
+ doSCAMiopdata = .true.
+ iopfile = 'S12_CTL_Dec2010c_Turnedv2_QuasiEquil_MixedLayerInit_q6w1.5.nc' ! get full height sounding to yield heights as function of pressure.
+ dozero_out_day0 = .false.
+ use_scam_reference_sounding = .true.
+ 
+ doSAMconditionals = .true.
+ dosatupdnconditionals = .true.
+
+ perturb_type = 6
+
+do_chunked_energy_budgets = .true.
+do_chunked_momentum_budgets = .false.
+nsaveMSE = 300,
+! nsaveMSEstart = 0,
+! nsaveMSEend = 9999999999,
+nchunk_x_gl = 240 
+nchunk_y_gl = 24
+
+ncycle_min = 2,
+ncycle_max = 40,
+ncycle0 = 2,
+
+cfl_safety_factor = 1.5
+
+/ 
+

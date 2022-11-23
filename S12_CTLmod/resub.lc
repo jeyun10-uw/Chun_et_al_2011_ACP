@@ -1,0 +1,66 @@
+#!/bin/sh -f
+#PBS -l nodes=12:ppn=12
+#PBS -l walltime=07:45:00
+#PBS -W x=NACCESSPOLICY:SINGLEJOB
+#PBS -W group_list=wood
+#PBS -m e
+#PBS -M jeyun10@atmos.washington.edu
+#PBS -N zS12_CTLmod_Devel_lc
+
+cat $PBS_NODEFILE
+
+scriptdir=/path/to/SAMUWgh-2022-05-07 # Set a path to the script
+case=S12_CTLmod                       # Case name
+subcase=lc                            # Subcase name, specify 
+jobfile=$case/resub.$subcase          #  
+logfile=log_$case$subcase
+prmfile=$case/prm.$subcase
+prmloc=$case/prm
+cluster=challenger
+SAMname=../SAM_ADV_SELPPM_SGS_TKE_RAD_RRTM4PBL_MICRO_M2005_PA_3d_96x96x192_48proc_2019-11-22
+
+# Change to correct directory
+\cd $scriptdir
+\cp $case/CaseName ./
+\cp $prmfile $prmloc
+
+if [ ! -e $SAMname ]
+    then
+    echo Could not find $SAMname
+    echo Executable does not exist
+    exit 9
+fi
+
+# load modules for intel setup
+source /etc/profile.d/modules.sh
+module load intel/13.1.1 openmpi/1.6.4 netcdf/4.3.0
+export LD_LIBRARY_PATH=/usr/local/modules/openmpi/1.6.4/intel/13.1.1/lib:${LD_LIBRARY_PATH}
+
+cat >$SAMname.sh <<EOF
+#!/bin/sh
+ulimit -s unlimited
+exec $SAMname
+EOF
+chmod +x $SAMname.sh
+time mpirun $SAMname.sh >> $logfile
+
+####time mpirun $SAMname >> $logfile
+
+exitstatus=$?
+echo SAM stopped with exit status $exitstatus
+
+# Wait for a few seconds to make sure everything is finished
+sleep 5 
+echo $exitstatus exitstatus
+
+if [ $exitstatus -eq 0 ]
+    then
+    echo It appears the previous run ended properly and job not yet finished.
+    echo Resubmitting $jobfile
+    cat $prmfile | sed s/nrestart.\*=.\*0/nrestart\ =\ 1/ > temp.namelist
+    \mv temp.namelist $prmfile
+    \cp $prmfile $prmloc
+    rsh $cluster "cd $scriptdir; /usr/local/bin/qsub $jobfile"
+fi
+
+exit 0
