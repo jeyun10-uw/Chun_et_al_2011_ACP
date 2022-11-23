@@ -1,3 +1,6 @@
-# Chun_et_al_2022_ACP
+# SAMUWgh
+github-hosted UW Version of SAM, the System for Atmospheric Modeling
 
-[![DOI](https://zenodo.org/badge/569807324.svg)](https://zenodo.org/badge/latestdoi/569807324)
+This repository was created by Peter Blossey to maintain a version of
+SAM for use at the University of Washington with git as the version control
+system.
